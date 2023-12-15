@@ -1,22 +1,28 @@
+import React from 'react';
 import { useEffect } from 'react';
 import ProductItem from '../ProductItem';
-import { useStoreContext } from '../../utils/GlobalState';
+// import { useStoreContext } from '../../utils/GlobalState';
 import { UPDATE_PRODUCTS } from '../../utils/actions';
 import { useQuery } from '@apollo/client';
 import { QUERY_PRODUCTS } from '../../utils/queries';
 import { idbPromise } from '../../utils/helpers';
 import spinner from '../../assets/spinner.gif';
 
-function ProductList() {
-  const [state, dispatch] = useStoreContext();
+import { useSelector } from 'react-redux';
 
-  const { currentCategory } = state;
+import { store } from '../../utils/reducers';
+
+function ProductList() {
+
+  const products = useSelector(state => state.products);
+  const currentCategory = useSelector(state => state.currentCategory);
 
   const { loading, data } = useQuery(QUERY_PRODUCTS);
 
   useEffect(() => {
     if (data) {
-      dispatch({
+      console.log('in data')
+      store.dispatch({
         type: UPDATE_PRODUCTS,
         products: data.products,
       });
@@ -24,29 +30,35 @@ function ProductList() {
         idbPromise('products', 'put', product);
       });
     } else if (!loading) {
+      console.log('in !loading')
       idbPromise('products', 'get').then((products) => {
-        dispatch({
+        store.dispatch({
           type: UPDATE_PRODUCTS,
           products: products,
         });
       });
     }
-  }, [data, loading, dispatch]);
+
+
+  }, [data, loading, store.dispatch, products.length, currentCategory, store.getState]);
 
   function filterProducts() {
-    if (!currentCategory) {
-      return state.products;
-    }
+    console.log("inside filter prods", products)
 
-    return state.products.filter(
+    if (!currentCategory) {
+      return products;
+    }
+    console.log("inside filter prods", products)
+    return products.filter(
       (product) => product.category._id === currentCategory
     );
   }
+  
 
   return (
     <div className="my-2">
       <h2>Our Products:</h2>
-      {state.products.length ? (
+      {products.length ? (
         <div className="flex-row">
           {filterProducts().map((product) => (
             <ProductItem
