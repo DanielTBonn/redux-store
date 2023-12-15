@@ -6,19 +6,11 @@ import { idbPromise } from "../../utils/helpers";
 
 import { store } from "../../utils/reducers";
 
+import { useSelector } from "react-redux";
+
 function ProductItem(item) {
-  // const [state, dispatch] = useStoreContext();
 
-  let { cart } = store.getState(); 
-
-
-  // function render() {
-  //   let { cart } = store.getState(); 
-  // }
-
-  // render() 
-
-  // store.subscribe(render)
+  const cart = useSelector(state => state.cart)
 
   const {
     image,

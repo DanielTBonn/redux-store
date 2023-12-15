@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect } from 'react';
 import ProductItem from '../ProductItem';
 // import { useStoreContext } from '../../utils/GlobalState';
@@ -7,19 +8,20 @@ import { QUERY_PRODUCTS } from '../../utils/queries';
 import { idbPromise } from '../../utils/helpers';
 import spinner from '../../assets/spinner.gif';
 
+import { useSelector } from 'react-redux';
+
 import { store } from '../../utils/reducers';
 
 function ProductList() {
-  // const [state, dispatch] = useStoreContext();
 
-  // const { currentCategory } = state;
-
-  const { currentCategory, products } = store.getState();
+  const products = useSelector(state => state.products);
+  const currentCategory = useSelector(state => state.currentCategory);
 
   const { loading, data } = useQuery(QUERY_PRODUCTS);
 
   useEffect(() => {
     if (data) {
+      console.log('in data')
       store.dispatch({
         type: UPDATE_PRODUCTS,
         products: data.products,
@@ -28,6 +30,7 @@ function ProductList() {
         idbPromise('products', 'put', product);
       });
     } else if (!loading) {
+      console.log('in !loading')
       idbPromise('products', 'get').then((products) => {
         store.dispatch({
           type: UPDATE_PRODUCTS,
@@ -35,17 +38,22 @@ function ProductList() {
         });
       });
     }
-  }, [data, loading, store.dispatch, currentCategory, products]);
+
+
+  }, [data, loading, store.dispatch, products.length, currentCategory, store.getState]);
 
   function filterProducts() {
+    console.log("inside filter prods", products)
+
     if (!currentCategory) {
       return products;
     }
-
+    console.log("inside filter prods", products)
     return products.filter(
       (product) => product.category._id === currentCategory
     );
   }
+  
 
   return (
     <div className="my-2">

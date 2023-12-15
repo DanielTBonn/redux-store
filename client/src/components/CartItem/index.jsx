@@ -4,10 +4,12 @@ import { idbPromise } from "../../utils/helpers";
 
 import { store } from "../../utils/reducers";
 
+import { useSelector } from "react-redux";
+
 const CartItem = ({ item }) => {
 
   // const [, dispatch] = useStoreContext();
-
+  const cart = useSelector(state => state.cart)
 
   const removeFromCart = item => {
     store.dispatch({
